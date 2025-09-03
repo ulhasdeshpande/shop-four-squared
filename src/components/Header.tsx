@@ -1,8 +1,9 @@
 import { Search, ShoppingCart, Menu, User } from "lucide-react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/store/cartStore";
+import { useState } from "react";
 
 const categories = [
   { name: "Electronics", path: "/electronics" },
@@ -14,6 +15,15 @@ const categories = [
 export const Header = () => {
   const cartItems = useCartStore((state) => state.items);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <header className="bg-primary text-primary-foreground">
@@ -26,16 +36,22 @@ export const Header = () => {
           
           {/* Search bar */}
           <div className="flex-1 max-w-2xl mx-8">
-            <div className="relative">
+            <form onSubmit={handleSearch} className="relative">
               <Input
                 type="search"
                 placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-4 pr-12 py-2 bg-white text-foreground"
               />
-              <Button size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 bg-accent-orange hover:bg-accent-orange/90">
+              <Button 
+                type="submit"
+                size="sm" 
+                className="absolute right-1 top-1/2 -translate-y-1/2 bg-accent-orange hover:bg-accent-orange/90"
+              >
                 <Search className="h-4 w-4" />
               </Button>
-            </div>
+            </form>
           </div>
 
           {/* Right side actions */}
